@@ -3,6 +3,9 @@ package com.sendEmail.sendEmailContext.Entity;
 import java.util.List;
 
 public class EmailDetails {
+	
+	private int userId;
+	private int cartId;
 	private String subject;
 	private String custName;
 	private String custEmail;
@@ -76,10 +79,19 @@ public class EmailDetails {
 		this.productResponse = productResponse;
 	}
 
-	@Override
-	public String toString() {
-		return "EmailDetails [subject=" + subject + ", custName=" + custName + ", custEmail=" + custEmail
-				+ ", order_id=" + order_id + ", delivery_date=" + delivery_date + ", shippingCost=" + shippingCost
-				+ ", totalAmount=" + totalAmount + ", productResponse=" + productResponse + "]";
+	public int getUserId() {
+		return userId;
+	}
+
+	public void setUserId(int userId) {
+		this.userId = userId;
+	}
+
+	public int getCartId() {
+		return cartId;
+	}
+
+	public void setCartId(int cartId) {
+		this.cartId = cartId;
 	}
 }
