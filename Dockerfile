@@ -1,4 +1,6 @@
 FROM openjdk:17
+WORKDIR /app
+COPY target/email-service.jar /app/email-service.jar
+COPY src/main/resources/static /app/static
 EXPOSE 9503
-ADD target/email-service.jar email-service.jar
-ENTRYPOINT ["java","-jar","email-service.jar"]
+CMD ["java","-jar","email-service.jar"]

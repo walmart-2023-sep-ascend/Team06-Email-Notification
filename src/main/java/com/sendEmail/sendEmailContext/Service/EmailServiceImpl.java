@@ -1,17 +1,14 @@
 package com.sendEmail.sendEmailContext.Service;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
+
 import com.sendEmail.sendEmailContext.Entity.EmailDetails;
 import com.sendEmail.sendEmailContext.Entity.ProductResponse;
 
@@ -25,22 +22,28 @@ public class EmailServiceImpl implements EmailService {
 
 	@Value("${spring.mail.username}")
 	private String sender;
+	
+	@Value("${capstone.feedbackservice.url}")
+	private String feedbackserviceurl;
 
-	@Value("${pont.email.template.location}")
-	private String template;
-
+	private final HtmlReaderService htmlReaderService;
+	
+	public EmailServiceImpl(HtmlReaderService htmlReaderService) {
+		this.htmlReaderService=htmlReaderService;
+	}
 	public String sendEmail(EmailDetails details) {
 		MimeMessage mimeMessage = javaMailSender.createMimeMessage();
 		MimeMessageHelper mimeMessageHelper;
 		try {
 			String userId=String.valueOf(details.getUserId());
 			String cartId=String.valueOf(details.getCartId());
-			String url="http://localhost:3001/FeedbackForm/"+userId+"/"+cartId;
+			String url=feedbackserviceurl+userId+"/"+cartId;
 			mimeMessageHelper = new MimeMessageHelper(mimeMessage, true);
 			mimeMessageHelper.setFrom(sender);
 			mimeMessageHelper.setTo(details.getCustEmail());
 			mimeMessageHelper.setSubject("Order Confirmation");
-			String htmlBody = getEmailTemplate();
+			//String htmlBody = getEmailTemplate();
+			String htmlBody=htmlReaderService.readHtmlFile();
 			htmlBody = htmlBody.replace("{{customer_name}}", details.getCustName());
 			htmlBody = htmlBody.replace("{{order.order_id}}", details.getOrder_id());
 			htmlBody = htmlBody.replace("{{order.delivery_date}}", details.getDelivery_date().substring(0, 10));
@@ -58,23 +61,7 @@ public class EmailServiceImpl implements EmailService {
 			return "Error while sending mail!!";
 		}
 	}
-
-	private static String getEmailTemplate() throws IOException {
-		String templatePath = "C:\\Users\\r0k02j0\\Documents\\Ascend\\capstone\\sendEmailContext\\src\\main\\resources\\templates\\emailContext.html";
-		StringBuilder content = new StringBuilder();
-
-		try (BufferedReader br = new BufferedReader(new FileReader(templatePath))) {
-			String line;
-			while ((line = br.readLine()) != null) {
-				content.append(line);
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-		return content.toString();
-	}
-
+	
 	private static String getProdItemsHTML(EmailDetails details) {
 		List<ProductResponse> prodItems = new ArrayList<ProductResponse>();
 		StringBuilder itemsHTML = new StringBuilder();
